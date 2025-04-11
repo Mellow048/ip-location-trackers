@@ -1,56 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple IP Tracker</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
-    }
-    h2 {
-      color: #333;
-    }
-    p {
-      font-size: 18px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Tracker</title>
 </head>
 <body>
+    <h1>Welcome to the Location Tracker</h1>
+    <button onclick="getLocation()">Get Location</button>
+    <p id="location"></p>
 
-  <h2>IP-Based Location Tracker</h2>
-  <p>Click the button below to refresh your location based on your internet connection.</p>
-  <button onclick="getLocation()">Refresh Location</button>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                // Request location data
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
 
-  <div id="output">
-    <p>Location will be shown here.</p>
-  </div>
+        // Function to display the location
+        function showPosition(position) {
+            let lat = position.coords.latitude;
+            let lon = position.coords.longitude;
+            document.getElementById("location").innerHTML = "Latitude: " + lat + "<br>Longitude: " + lon;
+        }
 
-  <script>
-    function getLocation() {
-      const output = document.getElementById("output");
-      output.innerHTML = "Loading...";
-
-      fetch('https://ipapi.co/json/')  // Using ipapi for IP-based location
-        .then(res => res.json())
-        .then(data => {
-          const locationInfo = `
-            <p><strong>IP Address:</strong> ${data.ip}</p>
-            <p><strong>City:</strong> ${data.city}</p>
-            <p><strong>Region:</strong> ${data.region}</p>
-            <p><strong>Country:</strong> ${data.country_name}</p>
-            <p><strong>ISP/Org:</strong> ${data.org}</p>
-            <p><strong>Time Checked:</strong> ${new Date().toLocaleString()}</p>
-          `;
-          output.innerHTML = locationInfo;
-        })
-        .catch(error => {
-          output.innerHTML = `<p>Error: Could not retrieve location.</p>`;
-        });
-    }
-  </script>
-
+        // Function to handle errors
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById("location").innerHTML = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById("location").innerHTML = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById("location").innerHTML = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById("location").innerHTML = "An unknown error occurred.";
+                    break;
+            }
+        }
+    </script>
 </body>
 </html>
